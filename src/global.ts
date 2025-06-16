@@ -1,18 +1,20 @@
 import { RunRequest } from "@crowbartools/firebot-custom-scripts-types";
+import GoveeApi from "./backend/govee";
 
 export type Params = {
   goveeApiKey: string;
 }
 
 class PluginGlobals {
-    private _goveeApi: any;
+    private _goveeApi: GoveeApi;
     private _runRequest: RunRequest<Params>;
+    private _pluginVersion: string;
 
     get govee() {
         return this._goveeApi;
     }
 
-    set govee(goveeApi: any) {
+    set govee(goveeApi: GoveeApi) {
         this._goveeApi = goveeApi;
     }
 
@@ -22,6 +24,14 @@ class PluginGlobals {
 
     set runRequest(runRequest: RunRequest<Params>) {
         this._runRequest = runRequest;
+    }
+
+    get pluginVersion(): string {
+        return this._pluginVersion;
+    }
+
+    set pluginVersion(version: string) {
+        this._pluginVersion = version;
     }
 }
 
