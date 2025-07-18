@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <button type="button" class="close" aria-label="Close" ng-click="$ctrl.dismiss()"><span
+            aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title" id="editGroupLabel">{{isNewDeviceGroup ? "Add Device Group" : "Edit Device Group"}}</h4>
+</div>
+<div class="modal-body">
+    <div class="general-group-settings">
+        <div
+            style="display:inline-block;font-size: 14px;font-weight: 500;opacity: 0.7;margin:0;padding:0;text-transform: uppercase;margin-bottom: 1px;margin-left: 10px;">
+            Name</div>
+        <input type="text" class="form-control" ng-model="deviceGroup.name" placeholder="Enter name">
+    </div>
+    <div style="padding-top: 25px;">
+    <ui-select multiple ng-model="deviceGroup.devices" theme="bootstrap" close-on-select="false" class="control-type-list">
+        <ui-select-match placeholder="Select devices...">{{ $item.deviceName }}</ui-select-match>
+        <ui-select-choices repeat="device.id as device in devices | filter: { deviceName: $select.search }">
+            <div class="select-item" ng-bind-html="device.deviceName | highlight: $select.search"></div>
+        </ui-select-choices>
+        <div ng-if="devices.length < 1" class="muted">No devices found.</div>
+    </ui-select>
+    </div>
+    <div class="modal-footer">
+        <button ng-if="!isNewDeviceGroup" type="button" class="btn btn-danger pull-left" ng-click="$ctrl.confirmDelete()"
+            uib-tooltip="Delete Device Group"><i class="fal fa-trash-alt"></i></button>
+        <button type="button" class="btn btn-link" ng-click="$ctrl.dismiss()">Cancel</button>
+        <button type="button" class="btn btn-primary" ng-click="$ctrl.save()">Save</button>
+    </div>
+</div>

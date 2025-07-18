@@ -1,6 +1,7 @@
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const packageJson = require("./package.json");
+const DefinePlugin = require("webpack").DefinePlugin;
 
 module.exports = {
   target: "node",
@@ -15,6 +16,11 @@ module.exports = {
     path: path.resolve(__dirname, "./dist"),
     filename: `${packageJson.scriptOutputName}.js`,
   },
+  plugins: [
+    new DefinePlugin({
+      PLUGIN_VERSION: JSON.stringify(packageJson.version),
+    }),
+  ],
   resolve: {
     extensions: [".ts", ".js", ".html"],
   },

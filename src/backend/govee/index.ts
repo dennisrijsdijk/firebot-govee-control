@@ -20,4 +20,12 @@ export default class GoveeApi {
         this._capabilities.apiKey = apiKey;
         this._devices.apiKey = apiKey;
     }
+
+    get capabilities() {
+        return this._capabilities;
+    }
+
+    get devices() {
+        return this._devices;
+    }
 }

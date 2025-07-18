@@ -81,18 +81,23 @@ class GoveeCapabilitiesApi {
         return this.setDeviceCapability(apiDevice, capability);
     }
 
-    getDynamicScenes(apiDevice: ApiCommandDevice): Promise<any> {
+    getDynamicScenes(apiDevice: ApiCommandDevice): Promise<DynamicScene[]> {
         return apiCall(this._apiKey, `device/scenes`, 'POST', {
             device: apiDevice.device,
             sku: apiDevice.sku
+        }).then(response => {
+            return (response as any).payload.capabilities[0].parameters.options.map((scene: any) => ({
+                name: scene.name,
+                ...scene.value
+            }));
         });
     }
 
-    getCustomScenes(apiDevice: ApiCommandDevice): Promise<any> {
+    getDiyScenes(apiDevice: ApiCommandDevice): Promise<DiyScene[]> {
         return apiCall(this._apiKey, `device/diy-scenes`, 'POST', {
             device: apiDevice.device,
             sku: apiDevice.sku
-        });
+        }).then(response => (response as any).payload.capabilities[0].parameters.options);
     }
 
     setDynamicScene(apiDevice: ApiCommandDevice, paramId: number, id: number): Promise<any> {
@@ -110,7 +115,7 @@ class GoveeCapabilitiesApi {
         });
     }
 
-    setCustomScene(apiDevice: ApiCommandDevice, sceneId: number): Promise<any> {
+    setDiyScene(apiDevice: ApiCommandDevice, sceneId: number): Promise<any> {
         if (!sceneId) {
             throw new Error('Scene ID is required');
         }

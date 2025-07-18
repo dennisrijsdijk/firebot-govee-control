@@ -9,6 +9,7 @@ class PluginGlobals {
     private _goveeApi: GoveeApi;
     private _runRequest: RunRequest<Params>;
     private _pluginVersion: string;
+    private _scriptDataDir: string;
 
     get govee() {
         return this._goveeApi;
@@ -32,6 +33,14 @@ class PluginGlobals {
 
     set pluginVersion(version: string) {
         this._pluginVersion = version;
+    }
+
+    get scriptDataDir(): string {
+        return this._scriptDataDir;
+    }
+
+    set scriptDataDir(scriptDataDir: string) {
+        this._scriptDataDir = scriptDataDir;
     }
 }
 

@@ -1,0 +1,42 @@
+<div style="height: 100%;">
+    <div style="height: 100%;overflow-y: scroll;padding: 15px;">
+        <div class="mb-4" style="display:flex;flex-direction: row;align-items: center;">
+            <span class="mr-4" style="text-transform: uppercase;font-weight: 200;font-size: 19px;">Device Groups</span>
+            <div class="clickable" ng-click="goveeService.showAddOrEditDeviceGroupModal()" style="font-size: 15px;"><i class="fas fa-plus-circle"></i></div>
+        </div>
+        
+        <div class="new-tile-grid" style="width: 100%">
+            <div ng-repeat="(id, group) in goveeService.deviceGroups" class="new-tile gray centered">
+                <div class="edit-btn" ng-click="goveeService.showAddOrEditDeviceGroupModal(id)"></div>
+                <div class="content row">
+                    <div class="detail-wrapper nomargin">
+                        <div class="detail" style="font-size: 1.6em;">
+                            {{group.name}}
+                        </div>
+                        <div class="detail-description mt-2">{{group.devices.length}} devices</div>
+                    </div>
+                </div>
+            </div>
+
+            <p ng-if="goveeService.deviceGroupCount < 1" class="muted">No device groups saved.</p>
+        </div>
+
+        <div class="mb-4" style="display:flex;flex-direction: row;align-items: center;">
+            <span class="mr-4" style="text-transform: uppercase;font-weight: 200;font-size: 19px;">Devices</span>
+            <div class="clickable" ng-click="goveeService.showRefreshDevicesModal()" style="font-size: 15px;"><i class="fas fa-sync"></i></div>
+        </div>
+        <div class="new-tile-grid" style="width: 100%">
+            <div ng-repeat="(id, device) in goveeService.devices" class="new-tile gray centered">
+                <div class="content row">
+                    <div class="detail-wrapper nomargin">
+                        <div class="detail" style="font-size: 1.6em;">
+                            {{device.deviceName}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p ng-if="goveeService.deviceCount < 1" class="muted">No devices found.</p>
+        </div>
+    </div>
+</div>

@@ -109,3 +109,14 @@ type MusicModeParameters = {
     autoColor?: boolean;
     rgb?: string;
 }
+
+type DynamicScene = {
+    name: string;
+    id: number;
+    paramId: number;
+}
+
+type DiyScene = {
+    name: string;
+    value: number;
+}
