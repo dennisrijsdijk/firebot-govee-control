@@ -1,5 +1,6 @@
 import database from "./database"
 import globals from "../global";
+import updateGoveeDeviceEffect from "./update-govee-device-effect";
 
 export async function fetchDevices() {
     const devices = await globals.govee.devices.getDevices();
@@ -38,4 +39,6 @@ export async function initBackend() {
     globals.runRequest.modules.frontendCommunicator.onAsync('govee:fetch-devices', async () => {
         return fetchDevices();
     });
+
+    globals.runRequest.modules.effectManager.registerEffect(updateGoveeDeviceEffect);
 }

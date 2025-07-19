@@ -19,7 +19,7 @@ export type GoveeService = {
 
 const factory: AngularJsFactory = {
     name: "goveeService",
-    function: (backendCommunicator: any, modalService: any) => {
+    function: (backendCommunicator: any, utilityService: any) => {
         const backendCommunicatorShim = {
             on<T extends keyof FrontendCommunicatorCommands>(request: T, callback: (...args: FrontendCommunicatorCommands[T]["args"]) => Promise<FrontendCommunicatorCommands[T]["return"]>) {
                 backendCommunicator.onAsync(request, (args: FrontendCommunicatorCommands[T]["args"]) => callback(...args));
@@ -69,7 +69,7 @@ const factory: AngularJsFactory = {
                 });
             },
             showAddOrEditDeviceGroupModal: (groupId?: string) => {
-                modalService.showModal({
+                utilityService.showModal({
                     component: "addOrEditGoveeDeviceGroupModal",
                     size: "sm",
                     resolveObj: {
@@ -78,7 +78,7 @@ const factory: AngularJsFactory = {
                 });
             },
             showRefreshDevicesModal: () => {
-                modalService.showModal({
+                utilityService.showModal({
                     component: "refreshDevicesModal",
                     size: "sm"
                 });

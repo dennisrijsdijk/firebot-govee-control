@@ -23,7 +23,7 @@ const component: AngularJsComponent = {
         dismiss: "&",
         modalInstance: "<"
     },
-    controller: ($scope: Scope, goveeService: GoveeService, logger: any, modalFactory: any) => {
+    controller: ($scope: Scope, goveeService: GoveeService, logger: any, utilityService: any) => {
         const $ctrl = $scope.$ctrl;
         $scope.devices = Object.entries(goveeService.devices).map(([id, device]) => ({
             id,
@@ -93,7 +93,7 @@ const component: AngularJsComponent = {
             if ($scope.isNewDeviceGroup) {
                 return;
             }
-            modalFactory.showConfirmationModal({
+            utilityService.showConfirmationModal({
                 title: "Delete Device Group",
                 question: `Are you sure you want to delete the device group "${$scope.deviceGroup.name}"? This action cannot be undone.`,
                 confirmLabel: "Remove",
