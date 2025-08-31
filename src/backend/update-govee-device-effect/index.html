@@ -24,60 +24,69 @@
         <div ng-if="devices.length < 1" class="muted">No devices found.</div>
     </eos-container>
 
-    <!-- TODO: Check whether or not any selected device (group) actually supports a capability -->
     <eos-container
         ng-show="(effect.deviceSelectionMode === 'group' && effect.deviceGroupId) || (effect.deviceSelectionMode === 'device' && effect.deviceId)"
         header="Device Settings" pad-top="true">
-        <firebot-checkbox label="Set Device Power" model="effect.updateTypes.power.update"
-            aria-label="Toggle enabled" />
-        <div ng-if="effect.updateTypes.power.update">
-            <firebot-radios options="powerModeOptions" model="effect.updateTypes.power.value" inline="true">
-            </firebot-radios>
-            <firebot-input ng-if="effect.updateTypes.power.value === 'advanced'"
-                model="effect.updateTypes.power.advancedValue" placeholder="Enter power variable (on/off)"
-                input-title="Power (on/off)">
-            </firebot-input>
-            <br />
-        </div>
 
-        <firebot-checkbox label="Set Device Brightness" model="effect.updateTypes.brightness.update"
-            aria-label="Toggle enabled" />
-        <div ng-if="effect.updateTypes.brightness.update">
-            <firebot-input model="effect.updateTypes.brightness.value" placeholder="Enter brightness (0-100)"
-                input-title="Brightness (0-100)">
-            </firebot-input>
-            <br />
-        </div>
-
-        <firebot-checkbox disabled="effect.updateTypes.sceneV2.update" label="Set Device Color"
-            model="effect.updateTypes.color.update" aria-label="Toggle enabled" />
-        <div ng-if="effect.updateTypes.color.update">
-            <firebot-radios options="colorUpdateTypes" model="effect.updateTypes.color.type" label="Color Update Type"
-                placeholder="Select color update type...">
-            </firebot-radios>
-            <div ng-if="effect.updateTypes.color.type === 'preset'">
-                <color-picker-input model="effect.updateTypes.color.colorValue" lg-input="true"
-                    show-clear="false"></color-picker-input>
-            </div>
-            <div ng-if="effect.updateTypes.color.type === 'custom'">
-                <firebot-input model="effect.updateTypes.color.colorValue" placeholder="Enter color (#RRGGBB)"
-                    aria-label="Color value">
+        <div ng-if="compatibleCapabilities.powerSwitch">
+            <firebot-checkbox label="Set Device Power" model="effect.updateTypes.power.update"
+                aria-label="Toggle enabled" />
+            <div ng-if="effect.updateTypes.power.update">
+                <firebot-radios options="powerModeOptions" model="effect.updateTypes.power.value" inline="true">
+                </firebot-radios>
+                <firebot-input ng-if="effect.updateTypes.power.value === 'advanced'"
+                    model="effect.updateTypes.power.advancedValue" placeholder="Enter power variable (on/off)"
+                    input-title="Power (on/off)">
                 </firebot-input>
+                <br />
             </div>
-            <div ng-if="effect.updateTypes.color.type === 'temperature'">
-                <firebot-input model="effect.updateTypes.color.temperatureValue"
-                    placeholder="Enter color temperature (2700-6500)" aria-label="Temperature value">
-                </firebot-input>
-            </div>
-            <br />
         </div>
 
-        <firebot-checkbox disabled="effect.updateTypes.color.update" label="Set Device Scene"
+        <div ng-if="compatibleCapabilities.brightness">
+            <firebot-checkbox label="Set Device Brightness" model="effect.updateTypes.brightness.update"
+                aria-label="Toggle enabled" />
+            <div ng-if="effect.updateTypes.brightness.update">
+                <firebot-input model="effect.updateTypes.brightness.value" placeholder="Enter brightness (0-100)"
+                    input-title="Brightness (0-100)">
+                </firebot-input>
+                <br />
+            </div>
+        </div>
+
+        <div ng-if="compatibleCapabilities.colorRgb || compatibleCapabilities.colorTemperatureK">
+            <firebot-checkbox disabled="effect.updateTypes.sceneV2.update" label="Set Device Color"
+                model="effect.updateTypes.color.update" aria-label="Toggle enabled" />
+            <div ng-if="effect.updateTypes.color.update">
+                <firebot-radios
+                    options="(compatibleCapabilities.colorRgb && compatibleCapabilities.colorTemperatureK && combinedColorUpdateTypes || compatibleCapabilities.colorRgb && colorUpdateTypes || compatibleCapabilities.colorTemperatureK && temperatureUpdateTypes)"
+                    model="effect.updateTypes.color.type" label="Color Update Type"
+                    placeholder="Select color update type...">
+                </firebot-radios>
+                <div ng-if="effect.updateTypes.color.type === 'preset' && compatibleCapabilities.colorRgb">
+                    <color-picker-input model="effect.updateTypes.color.colorValue" lg-input="true"
+                        show-clear="false"></color-picker-input>
+                </div>
+                <div ng-if="effect.updateTypes.color.type === 'custom' && compatibleCapabilities.colorRgb">
+                    <firebot-input model="effect.updateTypes.color.colorValue" placeholder="Enter color (#RRGGBB)"
+                        aria-label="Color value">
+                    </firebot-input>
+                </div>
+                <div ng-if="effect.updateTypes.color.type === 'temperature' && compatibleCapabilities.colorTemperatureK">
+                    <firebot-input model="effect.updateTypes.color.temperatureValue"
+                        placeholder="Enter color temperature (2700-6500)" aria-label="Temperature value"
+                        input-title="Color Temperature (2700-6500)">
+                    </firebot-input>
+                </div>
+                <br />
+            </div>
+        </div>
+
+        <firebot-checkbox ng-if="compatibleCapabilities.lightScene || compatibleCapabilities.diyScene" disabled="effect.updateTypes.color.update" label="Set Device Scene"
             model="effect.updateTypes.sceneV2.update" aria-label="Toggle enabled" />
         <div ng-if="effect.updateTypes.sceneV2.update">
-            <firebot-radios options="sceneTypeOptions" model="effect.updateTypes.sceneV2.type" />
+            <firebot-radios options="(compatibleCapabilities.lightScene && compatibleCapabilities.diyScene && sceneTypeOptions || compatibleCapabilities.lightScene && dynamicSceneOptions || compatibleCapabilities.diyScene && diySceneOptions)" model="effect.updateTypes.sceneV2.type" />
 
-            <div ng-if="effect.updateTypes.sceneV2.type === 'preset'">
+            <div ng-if="effect.updateTypes.sceneV2.type === 'preset' && compatibleCapabilities.lightScene">
                 <ui-select ng-model="effect.updateTypes.sceneV2.presetScene" theme="bootstrap"
                     class="control-type-list">
                     <ui-select-match placeholder="Select preset scene...">{{ $select.selected }}</ui-select-match>
@@ -87,13 +96,13 @@
                 </ui-select>
             </div>
 
-            <div ng-if="effect.updateTypes.sceneV2.type === 'presetAdvanced'">
+            <div ng-if="effect.updateTypes.sceneV2.type === 'presetAdvanced' && compatibleCapabilities.lightScene">
                 <firebot-input model="effect.updateTypes.sceneV2.presetScene" placeholder="Enter custom scene name"
                     aria-label="Custom scene name" input-title="Govee Scene Name">
                 </firebot-input>
             </div>
 
-            <div ng-if="effect.updateTypes.sceneV2.type === 'diy'">
+            <div ng-if="effect.updateTypes.sceneV2.type === 'diy' && compatibleCapabilities.diyScene">
                 <ui-select ng-model="effect.updateTypes.sceneV2.diyScene" theme="bootstrap" class="control-type-list">
                     <ui-select-match placeholder="Select DIY scene...">{{ $select.selected }}</ui-select-match>
                     <ui-select-choices repeat="scene in diyScenes | filter: $select.search">
@@ -101,13 +110,12 @@
                     </ui-select-choices>
                 </ui-select>
             </div>
-            <div ng-if="effect.updateTypes.sceneV2.type === 'diyAdvanced'">
+            <div ng-if="effect.updateTypes.sceneV2.type === 'diyAdvanced' && compatibleCapabilities.diyScene">
                 <firebot-input model="effect.updateTypes.sceneV2.diyScene" placeholder="Enter custom scene name"
                     aria-label="DIY scene name" input-title="DIY Scene Name">
                 </firebot-input>
             </div>
             <br />
         </div>
-
     </eos-container>
 </div>
