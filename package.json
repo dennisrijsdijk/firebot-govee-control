@@ -1,7 +1,7 @@
 {
   "name": "@dennisrijsdijk/firebot-govee-control",
   "scriptOutputName": "govee-control",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Firebot script to control Govee devices like Lights and Power Switches",
   "main": "",
   "scripts": {
