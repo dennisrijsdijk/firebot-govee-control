@@ -7,14 +7,14 @@
   "scripts": {
     "build": "webpack",
     "build:copy": "npm run build && npm run copy",
-    "build:dev": "NODE_ENV=development npm run build && npm run copy",
+    "build:dev": "webpack --env dev && npm run copy",
     "copy": "node ./scripts/copy-build.js",
     "test": "jest"
   },
   "author": "dennisrijsdijk",
   "license": "GNU3",
   "devDependencies": {
-    "@crowbartools/firebot-custom-scripts-types": "github:crowbartools/firebot-custom-scripts-types#27eccece986262949732b4a78f2b6be80cca99cb",
+    "@crowbartools/firebot-custom-scripts-types": "^5.65.1",
     "@types/node": "^20.14.0",
     "html-loader": "^5.1.0",
     "node-json-db": "^2.3.1",

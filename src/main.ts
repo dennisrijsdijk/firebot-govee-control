@@ -4,6 +4,7 @@ import globals from "./global";
 import { initBackend, fetchDevices } from "./backend";
 import initFrontend from "./frontend";
 import GoveeApi from "./backend/govee";
+import * as fs from "fs";
 
 
 const script: Firebot.CustomScript<Params> = {
@@ -29,16 +30,14 @@ const script: Firebot.CustomScript<Params> = {
         };
     },
     run: async (runRequest) => {
-        // @ts-expect-error
         if (runRequest.scriptDataDir) {
-            // @ts-expect-error
             globals.scriptDataDir = runRequest.scriptDataDir;
         } else {
             const scriptNameNormalized = (await script.getScriptManifest()).name.replace(/[#%&{}\\<>*?/$!'":@`|=\s-]+/g, "-").toLowerCase();
             globals.scriptDataDir = runRequest.modules.path.join(SCRIPTS_DIR, "..", "script-data", scriptNameNormalized);
         }
-        if (!runRequest.modules.fs.existsSync(globals.scriptDataDir)) {
-            runRequest.modules.fs.mkdirSync(globals.scriptDataDir, { recursive: true });
+        if (!fs.existsSync(globals.scriptDataDir)) {
+            fs.mkdirSync(globals.scriptDataDir, { recursive: true });
         }
         globals.runRequest = runRequest;
         globals.pluginVersion = PLUGIN_VERSION;
