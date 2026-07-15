@@ -36,7 +36,6 @@ export default defineConfig({
     ".svg": "base64"
   },
   define: {
-    PLUGIN_VERSION: JSON.stringify(version),
-    HIDE_DEBUG_EFFECT: "true"
+    PLUGIN_VERSION: JSON.stringify(version)
   }
 });

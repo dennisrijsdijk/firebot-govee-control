@@ -2,6 +2,7 @@ import { Plugin } from "@crowbartools/firebot-types";
 import uiExtension from "./frontend";
 import govee from "./backend/govee";
 import goveeDb from "./backend/database";
+import goveeLogo from "./govee-logo.svg";
 import updateGoveeDeviceEffect from "./backend/update-govee-device-effect";
 import frontendCommunicator from "./backend/frontend-communicator";
 
@@ -16,9 +17,9 @@ const plugin: Plugin<Params> = {
         ],
         repo: "https://github.com/dennisrijsdijk/firebot-govee-control",
         icon: {
-            type: "font-awesome",
-            name: "fa-lightbulb",
-            color: "#00a0df"
+            type: "custom",
+            url: `data:image/svg+xml;base64,${goveeLogo}`,
+            backgroundColor: "#53afff26"
         }
     },
     parametersSchema: [
