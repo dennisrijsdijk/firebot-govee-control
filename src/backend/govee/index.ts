@@ -1,16 +1,13 @@
 import GoveeCapabilitiesApi from "./capabilities";
 import GoveeDeviceApi from "./devices";
 
-export default class GoveeApi {
+class GoveeApi {
     private _capabilities: GoveeCapabilitiesApi;
     private _devices: GoveeDeviceApi;
 
-    constructor(apiKey: string) {
-        if (!apiKey) {
-            throw new Error('API key is required');
-        }
-        this._capabilities = new GoveeCapabilitiesApi(apiKey);
-        this._devices = new GoveeDeviceApi(apiKey);
+    constructor() {
+        this._capabilities = new GoveeCapabilitiesApi();
+        this._devices = new GoveeDeviceApi();
     }
 
     set apiKey(apiKey: string) {
@@ -29,3 +26,5 @@ export default class GoveeApi {
         return this._devices;
     }
 }
+
+export default new GoveeApi();

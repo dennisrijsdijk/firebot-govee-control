@@ -1,0 +1,3 @@
+type Params = {
+    goveeApiKey: string;
+}

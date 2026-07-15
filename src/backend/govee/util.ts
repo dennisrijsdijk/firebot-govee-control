@@ -1,5 +1,3 @@
-import globals from '../../global';
-
 export async function apiCall<T = unknown>(apiKey: string, route: string, method: 'GET' | 'POST' = 'GET', payload?: object): Promise<T> {
     const body = {
         requestId: crypto.randomUUID(),
@@ -9,7 +7,7 @@ export async function apiCall<T = unknown>(apiKey: string, route: string, method
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
         'Govee-API-Key': apiKey,
-        'User-Agent': `Firebot-Govee-Control/${globals.pluginVersion}`
+        'User-Agent': `Firebot-Govee-Control/${PLUGIN_VERSION}`
     };
 
     const response = await fetch(`https://openapi.api.govee.com/router/api/v1/${route}`, {

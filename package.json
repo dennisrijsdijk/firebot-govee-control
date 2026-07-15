@@ -1,31 +1,25 @@
 {
   "name": "@dennisrijsdijk/firebot-govee-control",
-  "scriptOutputName": "govee-control",
-  "version": "0.1.1",
-  "description": "Firebot script to control Govee devices like Lights and Power Switches",
+  "pluginOutputName": "govee-control",
+  "version": "1.0.0",
+  "description": "Firebot plugin to control Govee devices like Lights and Power Switches",
   "main": "",
   "scripts": {
-    "build": "webpack",
-    "build:copy": "npm run build && npm run copy",
-    "build:dev": "webpack --env dev && npm run copy",
-    "copy": "node ./scripts/copy-build.js",
-    "test": "jest"
+    "build": "tsdown",
+    "build:dev": "tsdown --minify false && npm run copy",
+    "copy": "node ./scripts/copy-build.js"
   },
   "author": "dennisrijsdijk",
-  "license": "GNU3",
+  "license": "GPL-3.0",
   "devDependencies": {
-    "@crowbartools/firebot-custom-scripts-types": "^5.65.1",
-    "@types/node": "^20.14.0",
-    "html-loader": "^5.1.0",
-    "node-json-db": "^2.3.1",
-    "terser-webpack-plugin": "^5.3.10",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.3.3",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4"
+    "@crowbartools/firebot-types": "^5.67.0-alpha28",
+    "@types/angular": "^1.8.9",
+    "@types/node": "^22.19.21",
+    "node-json-db": "^2.6.0",
+    "tsdown": "^0.22.5",
+    "typescript": "^5.9.2"
   },
   "volta": {
-    "node": "20.14.0",
-    "npm": "10.8.1"
+    "node": "24.18.0"
   }
 }

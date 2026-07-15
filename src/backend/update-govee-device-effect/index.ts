@@ -1,9 +1,8 @@
-import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
-import EffectType = Firebot.EffectType;
+import firebot, { EffectType } from "@crowbartools/firebot-types";
 import template from "./index.html";
 import { type GoveeService } from "../../frontend/govee-service";
 import database from "../database";
-import globals from "../../global";
+import govee from "../govee";
 
 type EffectModel = {
     deviceSelectionMode: "group" | "device";
@@ -47,8 +46,8 @@ type EffectModel = {
 }
 
 type EffectScope = ng.IScope & {
-    onDeviceSelected: (device: EffectScope["devices"][number]) => void;
-    onGroupSelected: (group: EffectScope["deviceGroups"][number]) => void;
+    onDeviceSelected: (device?: EffectScope["devices"][number]) => void;
+    onGroupSelected: (group?: EffectScope["deviceGroups"][number]) => void;
     validateNewCapabilities: () => void;
     effect: Partial<EffectModel>;
     compatibleCapabilities: Record<string, boolean>;
@@ -148,9 +147,9 @@ const effect: EffectType<EffectModel> = {
         }
         $scope.onGroupSelected = (group) => {
             $scope.compatibleCapabilities = {};
-            group.devices.forEach((deviceId) => {
+            group?.devices?.forEach((deviceId) => {
                 const device = $scope.devices.find(d => d.id === deviceId);
-                device.capabilities.forEach((cap) => {
+                device?.capabilities?.forEach((cap) => {
                     $scope.compatibleCapabilities[cap] = true;
                 });
             });
@@ -158,7 +157,7 @@ const effect: EffectType<EffectModel> = {
         };
         $scope.onDeviceSelected = (device) => {
             $scope.compatibleCapabilities = {};
-            device?.capabilities.forEach((cap) => {
+            device?.capabilities?.forEach((cap) => {
                 $scope.compatibleCapabilities[cap] = true;
             });
             $scope.validateNewCapabilities();
@@ -247,17 +246,17 @@ const effect: EffectType<EffectModel> = {
                 updateTypes: {}
             };
         }
-        if (!$scope.effect.updateTypes.power) {
-            $scope.effect.updateTypes.power = { update: false, value: "on" };
+        if (!$scope.effect.updateTypes!.power) {
+            $scope.effect.updateTypes!.power = { update: false, value: "on" };
         }
-        if (!$scope.effect.updateTypes.color) {
-            $scope.effect.updateTypes.color = { update: false, type: "preset", colorValue: "#ff69b4", temperatureValue: 4000 };
+        if (!$scope.effect.updateTypes!.color) {
+            $scope.effect.updateTypes!.color = { update: false, type: "preset", colorValue: "#ff69b4", temperatureValue: 4000 };
         }
-        if (!$scope.effect.updateTypes.brightness) {
-            $scope.effect.updateTypes.brightness = { update: false, value: 100 };
+        if (!$scope.effect.updateTypes!.brightness) {
+            $scope.effect.updateTypes!.brightness = { update: false, value: 100 };
         }
-        if (!$scope.effect.updateTypes.sceneV2) {
-            $scope.effect.updateTypes.sceneV2 = { update: false, type: "preset" };
+        if (!$scope.effect.updateTypes!.sceneV2) {
+            $scope.effect.updateTypes!.sceneV2 = { update: false, type: "preset" };
         }
 
         Promise.all([
@@ -269,17 +268,17 @@ const effect: EffectType<EffectModel> = {
             $scope.diyScenes = Object.values(diyScenes)[0];
             $scope.simpleDiyScenes = $scope.diyScenes.map(scene => scene.name);
 
-            if ($scope.effect.updateTypes.scene) {
-                $scope.effect.updateTypes.sceneV2.update = $scope.effect.updateTypes.scene.update;
-                $scope.effect.updateTypes.sceneV2.type = $scope.effect.updateTypes.scene.type;
-                if ($scope.effect.updateTypes.scene.presetScene) {
-                    $scope.effect.updateTypes.sceneV2.presetScene = $scope.presetScenes.find(scene => scene.id === $scope.effect.updateTypes.scene?.presetScene?.id && scene.paramId === $scope.effect.updateTypes.scene?.presetScene?.paramId)?.name;
+            if ($scope.effect.updateTypes!.scene) {
+                $scope.effect.updateTypes!.sceneV2!.update = $scope.effect.updateTypes!.scene.update;
+                $scope.effect.updateTypes!.sceneV2!.type = $scope.effect.updateTypes!.scene.type;
+                if ($scope.effect.updateTypes!.scene.presetScene) {
+                    $scope.effect.updateTypes!.sceneV2!.presetScene = $scope.presetScenes.find(scene => scene.id === $scope.effect.updateTypes!.scene?.presetScene?.id && scene.paramId === $scope.effect.updateTypes!.scene?.presetScene?.paramId)?.name;
                 }
-                if ($scope.effect.updateTypes.scene.diyScene) {
-                    $scope.effect.updateTypes.sceneV2.diyScene = $scope.diyScenes.find(scene => scene.value === $scope.effect.updateTypes.scene?.diyScene)?.name;
+                if ($scope.effect.updateTypes!.scene.diyScene) {
+                    $scope.effect.updateTypes!.sceneV2!.diyScene = $scope.diyScenes.find(scene => scene.value === $scope.effect.updateTypes!.scene?.diyScene)?.name;
                 }
-                $scope.effect.updateTypes.scene = undefined;
-                delete $scope.effect.updateTypes.scene;
+                $scope.effect.updateTypes!.scene = undefined;
+                delete $scope.effect.updateTypes!.scene;
             }
         });
     },
@@ -295,23 +294,23 @@ const effect: EffectType<EffectModel> = {
             errors.push("Please enter a power value.");
         }
 
-        if (effect.updateTypes.color.update && effect.updateTypes.color.type === "temperature" && !effect.updateTypes.color.temperatureValue) {
+        if (effect.updateTypes.color!.update && effect.updateTypes.color!.type === "temperature" && !effect.updateTypes.color!.temperatureValue) {
             errors.push("Please select a temperature value.");
-        } else if (effect.updateTypes.color.update && effect.updateTypes.color.type !== "temperature" && !effect.updateTypes.color.colorValue) {
+        } else if (effect.updateTypes.color!.update && effect.updateTypes.color!.type !== "temperature" && !effect.updateTypes.color!.colorValue) {
             errors.push("Please select a color value.");
         }
 
-        if (effect.updateTypes.brightness.update && (effect.updateTypes.brightness.value < 0 || effect.updateTypes.brightness.value > 100)) {
+        if (effect.updateTypes.brightness!.update && (effect.updateTypes.brightness!.value < 0 || effect.updateTypes.brightness!.value > 100)) {
             errors.push("Brightness value must be between 0 and 100.");
         }
 
-        if (effect.updateTypes.color.update && effect.updateTypes.sceneV2.update) {
+        if (effect.updateTypes.color!.update && effect.updateTypes.sceneV2!.update) {
             errors.push("You cannot update both color and scene at the same time. Please choose one.");
         }
 
-        if (effect.updateTypes.sceneV2.update && (effect.updateTypes.sceneV2.type === "preset" || effect.updateTypes.sceneV2.type === "presetAdvanced") && (!effect.updateTypes.sceneV2.presetScene || effect.updateTypes.sceneV2.presetScene.trim() === "")) {
+        if (effect.updateTypes.sceneV2!.update && (effect.updateTypes.sceneV2!.type === "preset" || effect.updateTypes.sceneV2!.type === "presetAdvanced") && (!effect.updateTypes.sceneV2!.presetScene || effect.updateTypes.sceneV2!.presetScene.trim() === "")) {
             errors.push("Please select a preset scene.");
-        } else if (effect.updateTypes.sceneV2.update && (effect.updateTypes.sceneV2.type === "diy" || effect.updateTypes.sceneV2.type === "diyAdvanced") && (!effect.updateTypes.sceneV2.diyScene || effect.updateTypes.sceneV2.diyScene.trim() === "")) {
+        } else if (effect.updateTypes.sceneV2!.update && (effect.updateTypes.sceneV2!.type === "diy" || effect.updateTypes.sceneV2!.type === "diyAdvanced") && (!effect.updateTypes.sceneV2!.diyScene || effect.updateTypes.sceneV2!.diyScene.trim() === "")) {
             errors.push("Please select a DIY scene.");
         }
 
@@ -323,22 +322,22 @@ const effect: EffectType<EffectModel> = {
     },
     onTriggerEvent: async (event) => {
         if (!Object.values(event.effect.updateTypes).some(update => update?.update)) {
-            globals.runRequest.modules.logger.debug("Govee: No updates selected, skipping effect.");
+            firebot.logger.debug("No updates selected, skipping effect.");
             return;
         }
         const actionableDevices: DatabaseSchema["devices"] = {};
         if (event.effect.deviceSelectionMode === "group") {
             const devices = await database.getDevices();
-            ((await database.getDeviceGroups())[event.effect.deviceGroupId]?.devices || [])
+            ((await database.getDeviceGroups())[event.effect.deviceGroupId!]?.devices || [])
                 .forEach(deviceId => actionableDevices[deviceId] = devices[deviceId]);
             if (Object.keys(actionableDevices).length < 1) {
-                globals.runRequest.modules.logger.debug("Govee: No devices found in the selected group.");
+                firebot.logger.debug("No devices found in the selected group.");
                 return;
             }
         } else {
             const devices = await database.getDevices();
             if (!event.effect.deviceId || !devices[event.effect.deviceId]) {
-                globals.runRequest.modules.logger.debug("Govee: No device selected or device not found.");
+                firebot.logger.debug("No device selected or device not found.");
                 return;
             }
             actionableDevices[event.effect.deviceId] = devices[event.effect.deviceId];
@@ -352,46 +351,46 @@ const effect: EffectType<EffectModel> = {
         const promises: Promise<any>[] = [];
 
         for (const [deviceId, device] of Object.entries(actionableDevices)) {
-            if (event.effect.updateTypes.power.update && device.capabilities.find(cap => cap.instance === "powerSwitch")) {
-                if (event.effect.updateTypes.power.value === "advanced") {
-                    const advancedValue = event.effect.updateTypes.power.advancedValue.trim().toLowerCase();
+            if (event.effect.updateTypes.power!.update && device.capabilities.find(cap => cap.instance === "powerSwitch")) {
+                if (event.effect.updateTypes.power!.value === "advanced") {
+                    const advancedValue = event.effect.updateTypes.power!.advancedValue!.trim().toLowerCase();
                     if (advancedValue === "on" || advancedValue === "off") {
-                        promises.push(globals.govee.capabilities.setPower({ sku: device.sku, device: deviceId }, advancedValue === "on"));
+                        promises.push(govee.capabilities.setPower({ sku: device.sku, device: deviceId }, advancedValue === "on"));
                     }
                 } else {
-                    promises.push(globals.govee.capabilities.setPower(
+                    promises.push(govee.capabilities.setPower(
                         { sku: device.sku, device: deviceId },
-                        event.effect.updateTypes.power.value === "on"
+                        event.effect.updateTypes.power!.value === "on"
                     ));
                 }
             }
-            if (event.effect.updateTypes.color.update && device.capabilities.find(cap => cap.instance === "colorRgb" || cap.instance === "colorTemperatureK")) {
-                if (event.effect.updateTypes.color.type === "temperature" && device.capabilities.find(cap => cap.instance === "colorTemperatureK")) {
-                    promises.push(globals.govee.capabilities.setColorTemperature({ sku: device.sku, device: deviceId }, event.effect.updateTypes.color.temperatureValue as number));
-                } else if ((event.effect.updateTypes.color.type === "preset" || event.effect.updateTypes.color.type === "custom") && device.capabilities.find(cap => cap.instance === "colorRgb")) {
-                    promises.push(globals.govee.capabilities.setColorRgb({ sku: device.sku, device: deviceId }, event.effect.updateTypes.color.colorValue));
+            if (event.effect.updateTypes.color!.update && device.capabilities.find(cap => cap.instance === "colorRgb" || cap.instance === "colorTemperatureK")) {
+                if (event.effect.updateTypes.color!.type === "temperature" && device.capabilities.find(cap => cap.instance === "colorTemperatureK")) {
+                    promises.push(govee.capabilities.setColorTemperature({ sku: device.sku, device: deviceId }, event.effect.updateTypes.color!.temperatureValue as number));
+                } else if ((event.effect.updateTypes.color!.type === "preset" || event.effect.updateTypes.color!.type === "custom") && device.capabilities.find(cap => cap.instance === "colorRgb")) {
+                    promises.push(govee.capabilities.setColorRgb({ sku: device.sku, device: deviceId }, event.effect.updateTypes.color!.colorValue));
                 }
             }
-            if (event.effect.updateTypes.brightness.update && device.capabilities.find(cap => cap.instance === "brightness")) {
-                promises.push(globals.govee.capabilities.setBrightness({ sku: device.sku, device: deviceId }, event.effect.updateTypes.brightness.value));
+            if (event.effect.updateTypes.brightness!.update && device.capabilities.find(cap => cap.instance === "brightness")) {
+                promises.push(govee.capabilities.setBrightness({ sku: device.sku, device: deviceId }, event.effect.updateTypes.brightness!.value));
             }
             if (event.effect.updateTypes.scene?.update && device.capabilities.find(cap => cap.instance === "lightScene" || cap.instance === "diyScene")) {
                 if (event.effect.updateTypes.scene.type === "preset" && device.capabilities.find(cap => cap.instance === "lightScene")) {
-                    promises.push(globals.govee.capabilities.setDynamicScene({ sku: device.sku, device: deviceId }, event.effect.updateTypes.scene.presetScene.paramId, event.effect.updateTypes.scene.presetScene.id));
+                    promises.push(govee.capabilities.setDynamicScene({ sku: device.sku, device: deviceId }, event.effect.updateTypes.scene.presetScene!.paramId, event.effect.updateTypes.scene.presetScene!.id));
                 } else if (event.effect.updateTypes.scene.type === "diy" && device.capabilities.find(cap => cap.instance === "diyScene")) {
-                    promises.push(globals.govee.capabilities.setDiyScene({ sku: device.sku, device: deviceId }, event.effect.updateTypes.scene.diyScene));
+                    promises.push(govee.capabilities.setDiyScene({ sku: device.sku, device: deviceId }, event.effect.updateTypes.scene.diyScene!));
                 }
             }
             if (event.effect.updateTypes.sceneV2?.update && device.capabilities.find(cap => cap.instance === "lightScene" || cap.instance === "diyScene")) {
                 if ((event.effect.updateTypes.sceneV2.type === "preset" || event.effect.updateTypes.sceneV2.type === "presetAdvanced") && device.capabilities.find(cap => cap.instance === "lightScene")) {
-                    const scene = dynamicScenes.find(scene => scene.name === event.effect.updateTypes.sceneV2.presetScene);
+                    const scene = dynamicScenes.find(scene => scene.name === event.effect.updateTypes.sceneV2!.presetScene);
                     if (scene) {
-                        promises.push(globals.govee.capabilities.setDynamicScene({ sku: device.sku, device: deviceId }, scene.paramId, scene.id));
+                        promises.push(govee.capabilities.setDynamicScene({ sku: device.sku, device: deviceId }, scene.paramId, scene.id));
                     }
                 } else if ((event.effect.updateTypes.sceneV2.type === "diy" || event.effect.updateTypes.sceneV2.type === "diyAdvanced") && device.capabilities.find(cap => cap.instance === "diyScene")) {
-                    const scene = diyScenes.find(scene => scene.name === event.effect.updateTypes.sceneV2.diyScene);
+                    const scene = diyScenes.find(scene => scene.name === event.effect.updateTypes.sceneV2!.diyScene);
                     if (scene) {
-                        promises.push(globals.govee.capabilities.setDiyScene({ sku: device.sku, device: deviceId }, scene.value));
+                        promises.push(govee.capabilities.setDiyScene({ sku: device.sku, device: deviceId }, scene.value));
                     }
                 }
             }

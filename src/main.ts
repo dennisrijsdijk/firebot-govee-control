@@ -1,57 +1,52 @@
-import { Firebot } from "@crowbartools/firebot-custom-scripts-types";
-import { Params } from "./global";
-import globals from "./global";
-import { initBackend, fetchDevices } from "./backend";
-import initFrontend from "./frontend";
-import GoveeApi from "./backend/govee";
-import * as fs from "fs";
+import { Plugin } from "@crowbartools/firebot-types";
+import uiExtension from "./frontend";
+import govee from "./backend/govee";
+import goveeDb from "./backend/database";
+import updateGoveeDeviceEffect from "./backend/update-govee-device-effect";
+import frontendCommunicator from "./backend/frontend-communicator";
 
-
-const script: Firebot.CustomScript<Params> = {
-    getScriptManifest: () => {
-        return {
-            name: "Govee Control",
-            description: "Firebot script to control Govee devices like Lights and Power Switches",
-            author: "DennisOnTheInternet",
-            version: PLUGIN_VERSION,
-            firebotVersion: "5",
-            startupOnly: true,
-        };
-    },
-    getDefaultParameters: () => {
-        return {
-            goveeApiKey: {
-                type: "password",
-                default: "",
-                description: "Govee API Key",
-                secondaryDescription: "Enter your Govee API key here",
-                title: "Govee API Key",
-            },
-        };
-    },
-    run: async (runRequest) => {
-        if (runRequest.scriptDataDir) {
-            globals.scriptDataDir = runRequest.scriptDataDir;
-        } else {
-            const scriptNameNormalized = (await script.getScriptManifest()).name.replace(/[#%&{}\\<>*?/$!'":@`|=\s-]+/g, "-").toLowerCase();
-            globals.scriptDataDir = runRequest.modules.path.join(SCRIPTS_DIR, "..", "script-data", scriptNameNormalized);
+const plugin: Plugin<Params> = {
+    manifest: {
+        name: "Govee Control",
+        version: PLUGIN_VERSION,
+        author: "DennisOnTheInternet",
+        description: "Firebot plugin to control Govee devices like lights and power switches",
+        tags: [
+            "lights"
+        ],
+        repo: "https://github.com/dennisrijsdijk/firebot-govee-control",
+        icon: {
+            type: "font-awesome",
+            name: "fa-lightbulb",
+            color: "#00a0df"
         }
-        if (!fs.existsSync(globals.scriptDataDir)) {
-            fs.mkdirSync(globals.scriptDataDir, { recursive: true });
-        }
-        globals.runRequest = runRequest;
-        globals.pluginVersion = PLUGIN_VERSION;
-        runRequest.modules.logger.info(`Govee Control plugin version: ${globals.pluginVersion}`);
-        globals.govee = new GoveeApi(runRequest.parameters.goveeApiKey);
-        initBackend();
-        initFrontend();
     },
-    parametersUpdated: async (parameters) => {
-        if (parameters.goveeApiKey) {
-            globals.govee.apiKey = parameters.goveeApiKey;
-            await fetchDevices();
+    parametersSchema: [
+        {
+            name: "goveeApiKey",
+            title: "Govee API Key",
+            type: "password",
+            default: ""
+        }
+    ],
+    registers: {
+        effects: [updateGoveeDeviceEffect],
+        frontendListeners: frontendCommunicator.frontendListeners,
+        uiExtensions: [uiExtension]
+    },
+    async onLoad(ctx) {
+        await goveeDb.init()
+        if (ctx.parameters.goveeApiKey && ctx.parameters.goveeApiKey.trim() !== "") {
+            govee.apiKey = ctx.parameters.goveeApiKey;
+            await goveeDb.fetchDevices();
+        }
+    },
+    async onParameterUpdate(ctx) {
+        if (ctx.parameters.goveeApiKey && ctx.parameters.goveeApiKey.trim() !== "") {
+            govee.apiKey = ctx.parameters.goveeApiKey;
+            await goveeDb.fetchDevices();
         }
     }
 };
 
-export default script;
+export default plugin;

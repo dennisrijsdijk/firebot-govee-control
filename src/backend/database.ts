@@ -1,20 +1,30 @@
-import frontendCommunicator from "./frontend-communicator";
-import globals from "../global";
+import { existsSync, mkdirSync } from "fs";
+import firebot from "@crowbartools/firebot-types";
+import govee from "./govee";
+import path from "path";
 
 import { JsonDB, Config } from "node-json-db";
 
 class GoveeDb {
     private _database: JsonDB;
+    private _dbDir: string;
+
+    constructor() {
+        this._dbDir = path.join(firebot.storage.path, "..", "govee-control");
+        if (!existsSync(this._dbDir)) {
+            mkdirSync(this._dbDir, { recursive: true });
+        }
+        const dbPath = path.join(this._dbDir, "db.json");
+        this._database = new JsonDB(new Config(dbPath, true, true, '/'));
+    }
 
     /**
      * Initializes the database.
      * @returns Returns true if the database was freshly created, false if it already exists.
      */
     async init(): Promise<boolean> {
-        this._database = new JsonDB(new Config(globals.runRequest.modules.path.join(globals.scriptDataDir, "db.json"), true, true, '/'));
         if (await this._database.exists("/devices")) {
-            this.setupFrontendListeners();
-            return false; // Database already exists, no need to seed device data
+            return false; // Database already exists, no need to seed schema
         }
 
         await this._database.push("/", {
@@ -23,7 +33,6 @@ class GoveeDb {
             dynamicScenes: {},
             diyScenes: {}
         }, true);
-        this.setupFrontendListeners();
         return true;
     }
 
@@ -60,22 +69,34 @@ class GoveeDb {
         this._database.push("/diyScenes", diyScenes, true);
     }
 
-    private setupFrontendListeners() {
-        frontendCommunicator.on('govee:get-devices', async () => {
-            return this.getDevices();
-        });
-        frontendCommunicator.on('govee:get-device-groups', async () => {
-            return this.getDeviceGroups();
-        });
-        frontendCommunicator.on('govee:set-device-groups', async (deviceGroups: DatabaseSchema["deviceGroups"]) => {
-            return this.setDeviceGroups(deviceGroups);
-        });
-        frontendCommunicator.on('govee:get-dynamic-scenes', async () => {
-            return this.getDynamicScenes();
-        });
-        frontendCommunicator.on('govee:get-diy-scenes', async () => {
-            return this.getDiyScenes();
-        });
+    async fetchDevices() {
+        const devices = await govee.devices.getDevices();
+        if (devices.length === 0) {
+            return;
+        }
+        await this.setDevices(Object.fromEntries(devices.map(device => [device.device, device])));
+        const deviceTypes: GoveeDevice[] = [];
+        for (const device of devices) {
+            if (!deviceTypes.find(storedDevice => storedDevice.type === device.type)) {
+                deviceTypes.push(device);
+            }
+        }
+
+        firebot.logger.debug("Fetching dynamic and DIY scenes for devices:", deviceTypes);
+
+        const deviceDynamicScenes = Object.fromEntries(await Promise.all(deviceTypes.map(async device => {
+            const scenes = await govee.capabilities.getDynamicScenes({ device: device.device, sku: device.sku });
+            return [device.sku, scenes];
+        })));
+
+        await this.setDynamicScenes(deviceDynamicScenes);
+
+        const deviceDiyScenes = Object.fromEntries(await Promise.all(deviceTypes.map(async device => {
+            const scenes = await govee.capabilities.getDiyScenes({ device: device.device, sku: device.sku });
+            return [device.sku, scenes];
+        })));
+
+        await this.setDiyScenes(deviceDiyScenes);
     }
 }
 

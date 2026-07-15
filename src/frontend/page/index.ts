@@ -1,4 +1,4 @@
-import { AngularJsPage } from "@crowbartools/firebot-custom-scripts-types/types/modules/ui-extension-manager";
+import { AngularJsPage } from "@crowbartools/firebot-types";
 import template from "./index.html";
 import { type GoveeService } from "../govee-service";
 

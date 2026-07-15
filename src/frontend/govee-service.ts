@@ -1,4 +1,4 @@
-import { AngularJsFactory } from "@crowbartools/firebot-custom-scripts-types/types/modules/ui-extension-manager"
+import { AngularJsFactory } from "@crowbartools/firebot-types";
 
 export type GoveeService = {
     devices: DatabaseSchema["devices"];
@@ -36,35 +36,35 @@ const factory: AngularJsFactory = {
             dynamicScenes: {},
             diyScenes: {},
             getDevices: async () => {
-                service.devices = await backendCommunicatorShim.send("govee:get-devices");
+                service.devices = await backendCommunicatorShim.send("dennisontheinternet:govee:get-devices");
                 service.deviceCount = Object.keys(service.devices).length;
                 return service.devices;
             },
             getDeviceGroups: async () => {
-                service.deviceGroups = await backendCommunicatorShim.send("govee:get-device-groups");
+                service.deviceGroups = await backendCommunicatorShim.send("dennisontheinternet:govee:get-device-groups");
                 service.deviceGroupCount = Object.keys(service.deviceGroups).length;
                 return service.deviceGroups;
             },
             setDeviceGroups: async (deviceGroups) => {
                 service.deviceGroups = deviceGroups;
                 service.deviceGroupCount = Object.keys(deviceGroups).length;
-                return backendCommunicatorShim.send("govee:set-device-groups", deviceGroups);
+                return backendCommunicatorShim.send("dennisontheinternet:govee:set-device-groups", deviceGroups);
             },
             getDynamicScenes: async () => {
-                service.dynamicScenes = await backendCommunicatorShim.send("govee:get-dynamic-scenes");
+                service.dynamicScenes = await backendCommunicatorShim.send("dennisontheinternet:govee:get-dynamic-scenes");
                 return service.dynamicScenes;
             },
             getDiyScenes: async () => {
-                service.diyScenes = await backendCommunicatorShim.send("govee:get-diy-scenes");
+                service.diyScenes = await backendCommunicatorShim.send("dennisontheinternet:govee:get-diy-scenes");
                 return service.diyScenes;
             },
             refreshDevices: async () => {
-                return backendCommunicatorShim.send("govee:fetch-devices").then(async () => {
+                return backendCommunicatorShim.send("dennisontheinternet:govee:fetch-devices").then(async () => {
                     await Promise.all([
-                        service.getDevices(),
-                        service.getDeviceGroups(),
-                        service.getDynamicScenes(),
-                        service.getDiyScenes()
+                        service.getDevices!(),
+                        service.getDeviceGroups!(),
+                        service.getDynamicScenes!(),
+                        service.getDiyScenes!()
                     ]);
                 });
             },
@@ -86,10 +86,10 @@ const factory: AngularJsFactory = {
         };
 
         Promise.all([
-            service.getDevices(),
-            service.getDeviceGroups(),
-            service.getDynamicScenes(),
-            service.getDiyScenes()
+            service.getDevices!(),
+            service.getDeviceGroups!(),
+            service.getDynamicScenes!(),
+            service.getDiyScenes!()
         ]);
 
         return service;

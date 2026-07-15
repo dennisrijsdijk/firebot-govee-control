@@ -2,11 +2,7 @@ import { apiCall, hexToRgbInt } from './util'
 
 
 class GoveeCapabilitiesApi {
-    private _apiKey: string;
-
-    constructor(apiKey: string) {
-        this._apiKey = apiKey;
-    }
+    private _apiKey?: string;
 
     set apiKey(apiKey: string) {
         if (!apiKey) {
@@ -16,6 +12,10 @@ class GoveeCapabilitiesApi {
     }
 
     private setDeviceCapability(apiDevice: ApiCommandDevice, capability: SimpleCommandCapability | StructCommandCapability): Promise<any> {
+        if (!this._apiKey) {
+            throw new Error("setDeviceCapability: apiKey was null");
+        }
+
         return apiCall(this._apiKey, `device/control`, 'POST', {
             device: apiDevice.device,
             sku: apiDevice.sku,
@@ -82,6 +82,10 @@ class GoveeCapabilitiesApi {
     }
 
     getDynamicScenes(apiDevice: ApiCommandDevice): Promise<DynamicScene[]> {
+        if (!this._apiKey) {
+            throw new Error("getDynamicScenes: apiKey was null");
+        }
+
         return apiCall(this._apiKey, `device/scenes`, 'POST', {
             device: apiDevice.device,
             sku: apiDevice.sku
@@ -94,6 +98,10 @@ class GoveeCapabilitiesApi {
     }
 
     getDiyScenes(apiDevice: ApiCommandDevice): Promise<DiyScene[]> {
+        if (!this._apiKey) {
+            throw new Error("getDiyScenes: apiKey was null");
+        }
+
         return apiCall(this._apiKey, `device/diy-scenes`, 'POST', {
             device: apiDevice.device,
             sku: apiDevice.sku
